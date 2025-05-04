@@ -1,23 +1,25 @@
+using Microsoft.EntityFrameworkCore;
+using TestResultsApi.Data;
 using TestResultsApi.Formatters;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
 
 builder.Services.AddControllers(options =>
 {
     options.InputFormatters.Insert(0, new MarkrXmlInputFormatter());
 });
 
+builder.Services.AddDbContext<TestResultsDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+// Apply any pending DB migrations
+using var scope = app.Services.CreateScope();
+var db = scope.ServiceProvider.GetRequiredService<TestResultsDbContext>();
+db.Database.Migrate(); 
 
 app.MapControllers();
 app.UseHttpsRedirection();

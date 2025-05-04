@@ -9,7 +9,7 @@ public class McqTestResult
     public string ScannedOnRaw { get; set; }
 
     [XmlIgnore]
-    public DateTime ScannedOn => DateTime.Parse(ScannedOnRaw);
+    public DateTime ScannedOn => DateTime.Parse(ScannedOnRaw).ToUniversalTime();
 
     [XmlElement("first-name")]
     public string FirstName { get; set; }
