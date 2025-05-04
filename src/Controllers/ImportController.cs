@@ -1,5 +1,6 @@
 using TestResultsApi.Data;
 using TestResultsApi.Models;
+using TestResultsApi.Services;
 
 namespace TestResultsApi.Controllers;
 
@@ -7,23 +8,12 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("[controller]")]
-public class ImportController(TestResultsDbContext db) : ControllerBase
+public class ImportController(TestResultsService testResultsService) : ControllerBase
 {
-    
     [HttpPost]
     public async Task<IActionResult> Import([FromBody] McqTestResults results)
     {
-        var entities = results.Results.Select(r => new TestResultEntity
-        {
-            StudentNumber = r.StudentNumber,
-            TestId = r.TestId,
-            ScannedOn = r.ScannedOn,
-            AvailableMarks = r.SummaryMarks.Available,
-            ObtainedMarks = r.SummaryMarks.Obtained
-        });
-
-        await db.TestResults.AddRangeAsync(entities);
-        await db.SaveChangesAsync();
+        await testResultsService.ImportResults(results.Results);
 
         return Ok();
     }

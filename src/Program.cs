@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TestResultsApi.Data;
 using TestResultsApi.Formatters;
+using TestResultsApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,9 @@ builder.Services.AddControllers(options =>
 
 builder.Services.AddDbContext<TestResultsDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<ITestResultsRepository, TestResultsRepository>();
+builder.Services.AddScoped<TestResultsService>();
 
 var app = builder.Build();
 
