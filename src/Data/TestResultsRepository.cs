@@ -25,6 +25,17 @@ public class TestResultsRepository(TestResultsDbContext db): ITestResultsReposit
         return percentageScores;
     }
 
+    public async Task<TestResultEntity?> GetByStudentAndTestId(string studentNumber, string testId)
+    {
+        return await db.TestResults
+            .FirstOrDefaultAsync(r => r.StudentNumber == studentNumber && r.TestId == testId);
+    }
+    
+    public void Update(TestResultEntity result)
+    {
+        db.TestResults.Update(result);
+    }
+
     public async Task SaveChangesAsync()
     {
         await db.SaveChangesAsync();

@@ -8,16 +8,39 @@ public class TestResultsService(ITestResultsRepository repo)
 {
     public async Task ImportResults(List<McqTestResult> results)
     {
-        var entities = results.Select(r => new TestResultEntity
-        {
-            StudentNumber = r.StudentNumber,
-            TestId = r.TestId,
-            ScannedOn = r.ScannedOn,
-            AvailableMarks = r.SummaryMarks.Available,
-            ObtainedMarks = r.SummaryMarks.Obtained
-        });
+        List<TestResultEntity> toAdd = [];
         
-        await repo.AddRange(entities);
+        foreach (var result in results)
+        {
+            var entity = new TestResultEntity
+            {
+                StudentNumber = result.StudentNumber,
+                TestId = result.TestId,
+                ScannedOn = result.ScannedOn,
+                AvailableMarks = result.SummaryMarks.Available,
+                ObtainedMarks = result.SummaryMarks.Obtained
+            };
+            
+            var existing = await repo.GetByStudentAndTestId(entity.StudentNumber, entity.TestId);
+            
+            if (existing is null)
+            {
+                toAdd.Add(entity);
+            }
+            else
+            {
+                if (entity.ObtainedMarks > existing.ObtainedMarks || entity.AvailableMarks > existing.AvailableMarks)
+                {
+                    
+                    existing.ObtainedMarks = Math.Max(entity.ObtainedMarks, existing.ObtainedMarks);
+                    existing.AvailableMarks = Math.Max(entity.AvailableMarks, existing.AvailableMarks);
+                    existing.ScannedOn = entity.ScannedOn;
+                    repo.Update(existing);
+                }
+            }
+        }
+        
+        await repo.AddRange(toAdd);
         await repo.SaveChangesAsync();
     }
     
