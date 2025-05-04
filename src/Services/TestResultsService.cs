@@ -10,7 +10,15 @@ public class TestResultsService(ITestResultsRepository repo)
     {
         List<TestResultEntity> toAdd = [];
         
-        foreach (var result in results)
+        var bestResults = results // de-duplicate within batch by picking best result per Student+Test
+            .GroupBy(r => (r.StudentNumber, r.TestId))
+            .Select(g =>
+                g.OrderByDescending(r => r.SummaryMarks.Obtained)
+                    .ThenByDescending(r => r.SummaryMarks.Available)
+                    .First())
+            .ToList();
+        
+        foreach (var result in bestResults)
         {
             var entity = new TestResultEntity
             {

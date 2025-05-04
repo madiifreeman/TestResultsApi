@@ -114,4 +114,39 @@ public class TestResultsServiceTests
         _repoMock.Verify(r => r.Update(It.IsAny<TestResultEntity>()), Times.Never);
         _repoMock.Verify(r => r.AddRange(new List<TestResultEntity>()), Times.Once);
     }
+    
+    [Fact]
+    public async Task ImportResults_HandlesDuplicatesInSameBatch_UsesBestResult()
+    {
+        // Arrange
+        var worseResult = new McqTestResult
+        {
+            StudentNumber = StudentNum,
+            TestId = TestId,
+            ScannedOnRaw = "2017-12-04T12:12:10+11:00",
+            SummaryMarks = new SummaryMarks { Available = 100, Obtained = 80 }
+        };
+
+        var betterResult = new McqTestResult
+        {
+            StudentNumber = StudentNum,
+            TestId = TestId,
+            ScannedOnRaw = "2017-12-04T12:12:10+11:00",
+            SummaryMarks = new SummaryMarks { Available = 100, Obtained = 90 }
+        };
+
+        _repoMock.Setup(r => r.GetByStudentAndTestId("123", "Test1"))
+            .ReturnsAsync((TestResultEntity?)null);
+
+        // Act
+        await _service.ImportResults([worseResult, betterResult]);
+
+        // Assert
+        _repoMock.Verify(r => r.AddRange(It.Is<List<TestResultEntity>>(list =>
+            list.Count == 1 &&
+            list[0].ObtainedMarks == 90 &&
+            list[0].AvailableMarks == 100)), Times.Once);
+
+        _repoMock.Verify(r => r.SaveChangesAsync(), Times.Once);
+    }
 }
