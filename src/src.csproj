@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>TestResultsApi</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="TestResultsApi\obj\Debug\net9.0\TestResultsApi.sourcelink.json" />
+    <_ContentIncludedByDefault Remove="TestResultsApi\obj\project.assets.json" />
+    <_ContentIncludedByDefault Remove="TestResultsApi\obj\TestResultsApi.csproj.nuget.dgspec.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="TestResultsApi\Properties\launchSettings.json" />
+  </ItemGroup>
+
+</Project>
