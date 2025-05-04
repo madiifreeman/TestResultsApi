@@ -1,18 +1,14 @@
-﻿using System.Text;
+﻿using System.Net;
+using System.Text;
 
 namespace TestResultsApi.ComponentTests;
 
 public class ImportTests
 {
-    private readonly HttpClient _client;
-
-    public ImportTests()
+    private readonly HttpClient _client = new()
     {
-        _client = new HttpClient
-        {
-            BaseAddress = new System.Uri("http://localhost:5252") // TODO: pull from appsettings
-        };
-    }
+        BaseAddress = new Uri("http://localhost:5252") // TODO: pull from appsettings
+    };
     
     [Fact]
     public async Task PostImport_WithValidXml_Returns200Ok()
@@ -32,6 +28,20 @@ public class ImportTests
         var content = new StringContent(xml, Encoding.UTF8, "text/xml+markr");
         var response = await _client.PostAsync("/import", content);
 
-        Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+    
+    [Fact]
+    public async Task PostImport_WithInvalidXml_Returns400()
+    {
+        var invalidXml = """
+                      <mcq-test-result>
+                      </mcq-test-result>
+                  """;
+
+        var content = new StringContent(invalidXml, Encoding.UTF8, "text/xml+markr");
+        var response = await _client.PostAsync("/import", content);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 }
