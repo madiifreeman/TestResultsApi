@@ -7,7 +7,7 @@ public class ImportTests
 {
     private readonly HttpClient _client = new()
     {
-        BaseAddress = new Uri("http://localhost:5252") // TODO: pull from appsettings
+        BaseAddress = new Uri("http://localhost:4567") // TODO: pull from appsettings
     };
     
     [Fact]
