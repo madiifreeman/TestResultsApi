@@ -8,7 +8,7 @@ public class McqTestResult
     [XmlAttribute("scanned-on")]
     public string ScannedOnRaw { get; set; }
 
-    [XmlIgnore]
+    [XmlIgnore] // TODO: separate concerns of DTO and model so we don't have these ignored member vars
     public DateTime ScannedOn => DateTime.Parse(ScannedOnRaw).ToUniversalTime();
 
     [XmlElement("first-name")]
@@ -23,7 +23,7 @@ public class McqTestResult
     [XmlElement("test-id")]
     public string TestId { get; set; }
 
-    [XmlElement("summary-marks")]
+    [XmlElement("summary-marks")] 
     public SummaryMarks SummaryMarks { get; set; }
 }
 
@@ -34,4 +34,9 @@ public class SummaryMarks
 
     [XmlAttribute("obtained")]
     public int Obtained { get; set; }
+    
+    [XmlIgnore] // TODO: separate concerns of DTO and model so we don't have these ignored member vars
+    public double Percentage => Available > 0
+        ? (double)Obtained / Available * 100
+        : 0;
 }
